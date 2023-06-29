@@ -42,6 +42,10 @@ const FilteredEventsPage = (props) => {
   if (!filteredEvents || filteredEvents.length === 0) {
     return (
       <Fragment>
+         <Head>
+          <title>Filtered Events</title>
+          <meta name='description' content={`All events for ${props.date.month}/ ${props.date.year}`}/>
+         </Head>
         <ErrorAlert>
           <p>No events found for the chosen filter</p>
         </ErrorAlert>
@@ -58,7 +62,7 @@ const FilteredEventsPage = (props) => {
     <Fragment>
        <Head>
         <title>Filtered Events</title>
-        <meta name='description' content={`All events for ${numMonth}/ ${numYear}`}/>
+        <meta name='description' content={`All events for ${props.date.month}/ ${props.date.year}`}/>
       </Head>
       <ResultsTitle date={date} />
       <EventList items={filteredEvents} />
