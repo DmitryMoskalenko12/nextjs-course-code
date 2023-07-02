@@ -1,7 +1,11 @@
-const handler = (req, res) => {
+import { MongoClient } from "mongodb";
+
+const handler = async (req, res) => {
   const eventId = req.query.eventId;
 
-if (req.method === 'POST') {
+  const client = await MongoClient.connect('mongodb+srv://dmtrmsklnk:URiWUC0NOGWgoKXA@cluster0.mebjjwq.mongodb.net/events?retryWrites=true&w=majority');
+
+  if (req.method === 'POST') {
   const { email, name, text } = req.body;
 
   if (!email.includes('@') || !name || name.trim() === "" || !text || text.trim() === '') {
@@ -10,22 +14,29 @@ if (req.method === 'POST') {
   }
 
   const newComment = {
-    id: new Date().toISOString(),
     email,
     name,
-    text
+    text,
+    eventId
   }
+
+  const db = client.db();
+
+  const result = await db.collection('comments').insertOne(newComment);
+
+  newComment.id = result.insertedId;
+
   res.status(201).json({message: 'Added comment.', comment: newComment})
-  console.log(newComment)
+
 }
 
 if (req.method === 'GET') {
-  const dummyList = [
-    {id: 'e1', name: 'Max', text: 'A first comment'},
-    {id: 'e2', name: 'Manuel', text: 'A second comment!'}
-];
-res.status(200).json({comments: dummyList});
-}
+  const db = client.db();
 
+ const documets = await db.collection('comments').find().sort({_id: -1}).toArray();
+
+  res.status(200).json({comments: documets});
+}
+client.close()
 }
 export default handler;
