@@ -11,28 +11,36 @@ import ErrorAlert from '../../components/ui/error-alert';
 
 function FilteredEventsPage(props) {
   const [loadedEvents, setLoadedEvents] = useState();
+  const [err, setErr] = useState()
   const router = useRouter();
 
   const filterData = router.query.slug;
 
-  const { data, error } = useSWR(
+ /*  const { data, error } = useSWR(
     'https://nextdb-1f471-default-rtdb.firebaseio.com/events.json'
   );
+ */
 
   useEffect(() => {
-    if (data) {
-      const events = [];
-
-      for (const key in data) {
-        events.push({
-          id: key,
-          ...data[key],
-        });
+    fetch('https://nextdb-1f471-default-rtdb.firebaseio.com/events.json')
+    .then(res => res.json())
+    .then(data => {
+      if (data) {
+        const events = [];
+  
+        for (const key in data) {
+          events.push({
+            id: key,
+            ...data[key],
+          });
+        }
+  
+        setLoadedEvents(events);
       }
-
-      setLoadedEvents(events);
-    }
-  }, [data]);
+    })
+    .catch(err => setErr(err))
+   
+  }, [loadedEvents]);
 
   let pageHeadData = (
     <Head>
@@ -73,7 +81,7 @@ function FilteredEventsPage(props) {
     numYear < 2021 ||
     numMonth < 1 ||
     numMonth > 12 ||
-    error
+    err
   ) {
     return (
       <Fragment>
